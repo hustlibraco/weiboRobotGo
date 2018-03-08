@@ -14,38 +14,28 @@
   <div class="container">
     <h1>
       <a href="http://weibo.com/u/5992909524" target="_blank">
-        <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="sha256cc" class="img-circle">
+        <img src="static/avatar.jpg" alt="sha256cc" class="img-circle">
       </a>
       <small>来@sha256cc吧！</small>
     </h1>
   <hr/>
-  {% if weibos %}
-    {% for i in weibos %}
-      <h6>
-        <strong>{{ i['author' ]}}</strong>
-        <small>
-          <a href="{{ i['url' ] }}" target="_blank">{{ datetime(i['addtime']) }}</a>
-        </small>
-      </h6>
-      <p>{{ i['text' ]}}</p>
-      {% if i.get('pics') %}
-        {% for img in i['pics'] %}
-          <a href="#" class="thumbnail" data-toggle="modal" data-target="#imageModal">
-            <img src="{{ img }}">
-          </a>
-        {% endfor %}
-      {% endif %}
-      <br/>
-      <small>@ by {{ i['at_by'] }} at {{ datetime(i['at_time'])}}</small>
-      <hr/>
-    {% endfor %}
-  {% endif %}
-  {% if last %}
-  <a class="pull-left" href="{{ url_for('show', page=last) }}">上一页</a>
-  {% endif %}
-  {% if next %}
-  <a class="pull-right" href="{{ url_for('show', page=next) }}">下一页</a>
-  {% endif %}
+  {{ range .Weibos }}
+    <h6>
+      <strong>{{ .Author }}</strong>
+      <small>
+        <a href="{{ .Url }}" target="_blank">{{ .Addtime }}</a>
+      </small>
+    </h6>
+    <p>{{ .Text }}</p>
+    {{ range .Pics }}
+      <a href="#" class="thumbnail" data-toggle="modal" data-target="#imageModal">
+        <img src="{{ . }}">
+      </a>
+    {{ end }}
+    <br/>
+    <small>@ by {{ .At_by }} at {{ .At_time }}</small>
+    <hr/>
+  {{ end }}
   </div>
 </body>
 <!-- Modal -->
