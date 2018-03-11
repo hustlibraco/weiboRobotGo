@@ -14,7 +14,7 @@
   <div class="container">
     <h1>
       <a href="http://weibo.com/u/5992909524" target="_blank">
-        <img src="static/avatar.jpg" alt="sha256cc" class="img-circle">
+        <img src="/static/avatar.jpg" alt="sha256cc" class="img-circle">
       </a>
       <small>来@sha256cc吧！</small>
     </h1>
@@ -23,7 +23,7 @@
     <h6>
       <strong>{{ .Author }}</strong>
       <small>
-        <a href="{{ .Url }}" target="_blank">{{ .Addtime }}</a>
+        <a href="{{ .URL }}" target="_blank">{{ .FormatTime .Addtime }}</a>
       </small>
     </h6>
     <p>{{ .Text }}</p>
@@ -33,9 +33,16 @@
       </a>
     {{ end }}
     <br/>
-    <small>@ by {{ .At_by }} at {{ .At_time }}</small>
+    <small>@ by {{ .At_By }} at {{ .FormatTime .At_Time }}</small>
     <hr/>
   {{ end }}
+  <p>共计{{ .AllPage }}页，当前{{ .Page }}页</p>
+  {{ if gt .LastPage 0 }}
+  <a class="pull-left" href="/page/{{ .LastPage }}">上一页</a>
+  {{ end }}
+  {{ if gt .NextPage 0 }}
+  <a class="pull-right" href="/page/{{ .NextPage }}">下一页</a>
+  {{ end }}  
   </div>
 </body>
 <!-- Modal -->
