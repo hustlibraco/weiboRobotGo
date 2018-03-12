@@ -29,13 +29,14 @@ type Weibo struct {
 	At_Time int64    `json:"at_time"`
 }
 
+
 func (wb *Weibo) FormatTime(i int64) string {
 	tm := time.Unix(i, 0)
 	return tm.Format(timeLayout)
 }
 
 func (wb *Weibo) Sync(session *mgo.Session) {
-
+	
 }
 
 type HTML struct {
@@ -47,26 +48,8 @@ type HTML struct {
 	PageNum  int
 }
 
-func Homepage(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/page/1", http.StatusFound)
-}
-
-func WeiboList(w http.ResponseWriter, r *http.Request) {
-	path := strings.Split(r.URL.Path, "/")
-	page, err := strconv.Atoi(path[len(path)-1])
-	if err != nil || page <= 0 {
-		http.Redirect(w, r, "/page/1", http.StatusFound)
-		return
-	}
+func (html *HTML) PageNew(session *mgo.Session, page int, pagenum int) {
 	weibos := make([]Weibo, pagenum)
-	html := new(HTML)
-	session, err := mgo.Dial("115.28.137.182:27017")
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("sinaweibo").C("weibos")
 	count, err := c.Find(nil).Count()
 	if err != nil {
@@ -93,12 +76,37 @@ func WeiboList(w http.ResponseWriter, r *http.Request) {
 	html.PageNum = pagenum
 	html.LastPage = lastpage
 	html.NextPage = nextpage
-	html.AllPage = allpage
+	html.AllPage = allpage	
+}
+
+
+
+func Homepage(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/page/1", http.StatusFound)
+}
+
+
+func WeiboList(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	page, err := strconv.Atoi(path[len(path)-1])
+	if err != nil || page <= 0 {
+		http.Redirect(w, r, "/page/1", http.StatusFound)
+		return
+	}
+	html := new(HTML)
+	session, err := mgo.Dial("115.28.137.182:27017")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	html.PageNew(session, page, pagenum)
 
 	fmt.Println(path[len(path)-1])
 	fmt.Printf("%+v\n", html)
 
-	t, err := template.New("html").ParseFiles("templates/html")
+	t, err := template.New("weibo.html").ParseFiles("templates/weibo.html")
 	err = t.Execute(w, html)
 	if err != nil {
 		fmt.Println(err)
