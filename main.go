@@ -3,41 +3,42 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
-	"io/ioutil"
-	"os"
 
 	"base62"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+
 	"github.com/json-iterator/go"
 	"gopkg.in/ini.v1"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
-	pagenum    = 10
-	timeLayout = "2006-01-02 15:04:05"
+	pagenum      = 10
+	timeLayout   = "2006-01-02 15:04:05"
 	timeParseFmt = "Mon Jan 02 15:04:05 -0700 2006"
-	weiboApi   = "https://api.weibo.com"
-	N = 10000000	// 约等于64^4 ？？	
+	weiboApi     = "https://api.weibo.com"
+	N            = 10000000 // 约等于64^4 ？？
 )
 
 // secret
 var (
 	weiboApiKey string
-	username string
-	password string
-	mongoURI string
-	webURI string
+	username    string
+	password    string
+	mongoURI    string
+	webURI      string
 )
 
 type Weibo struct {
-	Id		int64	 `json:"id"`
+	Id      int64    `json:"id"`
 	Author  string   `json:"author"`
 	URL     string   `json:"url"`
 	Text    string   `json:"text"`
@@ -60,10 +61,10 @@ func Strptime(s string) int64 {
 func MakeURL(uid, mid int64) string {
 	s := ""
 	for mid > 0 {
-		s = base62.Encode(int(mid % N)) + s
+		s = base62.Encode(int(mid%N)) + s
 		mid /= N
 	}
-    return fmt.Sprintf("https://weibo.com/%v/%v", uid, s)
+	return fmt.Sprintf("https://weibo.com/%v/%v", uid, s)
 }
 
 func MakePicURL(pid string) string {
@@ -217,21 +218,21 @@ func WeiboList(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 	cfg, err := ini.Load("config.ini")
-    if err != nil {
-        log.Printf("Fail to read file: %v", err)
-        os.Exit(1)
+	if err != nil {
+		log.Printf("Fail to read file: %v", err)
+		os.Exit(1)
 	}
 	weiboApiKey = cfg.Section("weibo").Key("api_key").String()
 	username = cfg.Section("weibo").Key("username").String()
 	password = cfg.Section("weibo").Key("password").String()
 	mongoURI = fmt.Sprintf(
-		"%v:%v", 
-		cfg.Section("mongo").Key("host").String(), 
+		"%v:%v",
+		cfg.Section("mongo").Key("host").String(),
 		cfg.Section("mongo").Key("port").String(),
 	)
 	webURI = fmt.Sprintf(
-		"%v:%v", 
-		cfg.Section("web").Key("host").String(), 
+		"%v:%v",
+		cfg.Section("web").Key("host").String(),
 		cfg.Section("web").Key("port").String(),
 	)
 }
