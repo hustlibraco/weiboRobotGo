@@ -29,7 +29,7 @@
     <p>{{ .Text }}</p>
     {{ range .Pics }}
       <a href="#" class="thumbnail" data-toggle="modal" data-target="#imageModal">
-        <img src="{{ . }}">
+        <img src="{{ . }}" referrerpolicy="no-referrer">
       </a>
     {{ end }}
     <br/>
@@ -50,7 +50,7 @@
   <div class="modal-dialog modal-lg img-modal" role="document">
     <div class="modal-content">
       <div class="modal-body">
-        <img id="largeimage">
+        <img id="largeimage" referrerpolicy="no-referrer">
       </div>
     </div>
   </div>
